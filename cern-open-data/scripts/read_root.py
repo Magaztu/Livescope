@@ -21,3 +21,31 @@ print("Keys in ROOT file: ", file.keys())
 tree = file["mini"]
 print("Branches in 'mini' tree: ", tree.keys())
 
+Names = [
+    "eventNumber",
+    "lep_n", "lep_pt", "lep_eta", "lep_phi", "lep_E", "lep_charge",
+    "photon_n", "photon_pt", "photon_eta", "photon_phi", "photon_E",
+    "met_et", "met_phi"
+]
+
+data = {} #This is a dictionary
+
+for Name in Names:
+    print(f"Reading branch: {Name}")
+    try:
+        data[Name] = tree[Name].array(library="np").tolist()
+    except Exception as e:
+        print(f"Failed to read branch {Name}, bcuz {e}")
+
+import json
+
+output_path = os.path.join(current_dir, "..", "output", "event_data.json")
+output_path = os.path.normpath(output_path)
+
+with open(output_path,"w") as fi:
+    json.dump(data, fi, indent=2) # Seems like -with- statement is used with open() to prevent errors
+
+print(f"Everything's good to go!! \nData exported to {output_path}")
+
+#Dangit, we hit a wall, seems like i'll have to use 'awkward' library (btw Pratyush Das ty for everthing you've contributed on the net tyttyytyt)
+#I'll leave this for l8r tho
