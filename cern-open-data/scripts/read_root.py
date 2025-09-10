@@ -17,3 +17,7 @@ file = uproot.open(root_file_path)
 
 # Esto debería enlistar las 'llaves' u objetos
 print("Keys in ROOT file: ", file.keys())
+
+tree = file["mini"]
+print("Branches in 'mini' tree: ", tree.keys())
+
