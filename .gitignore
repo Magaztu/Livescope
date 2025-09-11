@@ -1,2 +1,4 @@
 *.pdf
 data_C.GamGam.root
+event_data.json
+/cern-open-data/output/event_data.json

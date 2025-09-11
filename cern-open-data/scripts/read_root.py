@@ -30,10 +30,12 @@ Names = [
 
 data = {} #This is a dictionary
 
+import awkward as ak
+
 for Name in Names:
     print(f"Reading branch: {Name}")
     try:
-        data[Name] = tree[Name].array(library="np").tolist()
+        data[Name] = tree[Name].array(library="ak").tolist()
     except Exception as e:
         print(f"Failed to read branch {Name}, bcuz {e}")
 
