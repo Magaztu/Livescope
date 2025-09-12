@@ -4,6 +4,10 @@ import fs from "fs";
 import path from "path";
 // I've gotta fix these imports CURSE YOUUU TS MODULESSS
 
+import { fileURLToPath } from "url"
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename);
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -13,6 +17,7 @@ const DATA_PATH = path.join(__dirname, "..","..","cern-open-data","output","even
 
 app.get("/events", (req, res) => {
     try {
+        console.log("Reading JSON from:", DATA_PATH);
         const rawData = fs.readFileSync(DATA_PATH, "utf-8");
         const jsonData = JSON.parse(rawData);
 
