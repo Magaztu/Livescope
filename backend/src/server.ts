@@ -41,7 +41,7 @@ import streamValues from "stream-json/streamers/streamValues.js"; // May this be
 
 const streamedPath = join(__dirname, "..","..","cern-open-data","output","event_data.json"); // ? No path.join since I'm importing join directly
 
-const BATCH_SIZE = 1000;
+const BATCH_SIZE = 100;
 
 app.get("/events-stream", (req, res) => {
     const results: Record<string, any[]> = {};
@@ -61,7 +61,7 @@ app.get("/events-stream", (req, res) => {
             res.write(JSON.stringify(currentBatch));
             currentBatch = [];
         }
-    })
+    });
     // stream.on("data", (data : { value: any }) => {
     //     const { value } = data;
         // if (typeof value === "object" && value !== null){
@@ -76,7 +76,11 @@ app.get("/events-stream", (req, res) => {
     // });
 
     stream.on("end", () => {
-        res.json(results);
+        // res.json(results);
+        if(currentBatch.length > 0) {
+            res.write(JSON.stringify(currentBatch));
+        }
+        res.end();
     });
 
     stream.on("error", (err: Error) => {
@@ -85,3 +89,5 @@ app.get("/events-stream", (req, res) => {
     })
 
 });
+
+// ? It still seems to be too much data to handle, I might need to think on a different approach to the backend and data fetch
