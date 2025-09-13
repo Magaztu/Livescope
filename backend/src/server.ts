@@ -41,13 +41,29 @@ import streamValues from "stream-json/streamers/streamValues.js"; // May this be
 
 const streamedPath = join(__dirname, "..","..","cern-open-data","output","event_data.json"); // ? No path.join since I'm importing join directly
 
+const BATCH_SIZE = 1000;
+
 app.get("/events-stream", (req, res) => {
     const results: Record<string, any[]> = {};
+    let currentBatch: any[] = [];
 
     const stream = createReadStream(streamedPath).pipe(new parser()).pipe(new streamValues());
 
-    stream.on("data", (data : { value: any }) => {
-        const { value } = data;
+    stream.on("data", ({key, value}: {key: string, value: any}) => {
+        if(!value || value.length === 0) return;
+
+        if(!results[key]) results[key] = [];
+        results[key] = results[key].concat(value);
+
+        currentBatch.push(value);
+
+        if(currentBatch.length >= BATCH_SIZE){
+            res.write(JSON.stringify(currentBatch));
+            currentBatch = [];
+        }
+    })
+    // stream.on("data", (data : { value: any }) => {
+    //     const { value } = data;
         // if (typeof value === "object" && value !== null){
         //     Object.entries(value).forEach(([key, val]) => {
         //         if (!results[key]) results[key] = []; // * One line if !!
@@ -55,9 +71,9 @@ app.get("/events-stream", (req, res) => {
         //     });
         // }
         // ~ This will allow me to see the data's json' structure, early:
-        console.log("Data, DATA EVENTTTT!", value);
-        res.json({sample: value});
-    });
+        // console.log("Data, DATA EVENTTTT!", value);
+        // res.json({sample: value});
+    // });
 
     stream.on("end", () => {
         res.json(results);
